@@ -58,7 +58,6 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-
 ## 📝 Project Structure
 
 ```
@@ -70,7 +69,6 @@ flat-rent/
 ├── utils/         # Utility functions
 └── lib/           # Library configurations
 ```
-
 
 ## 👥 Authors
 
