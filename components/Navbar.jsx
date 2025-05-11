@@ -1,154 +1,228 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Home, Menu, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import Link from "next/link";
+import { useState } from "react";
+
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
+import { Menu, X, Home, Building2, Search, User } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+
+const mainNavItems = [
+  {
+    title: "Browse Properties",
+    href: "/rent",
+    description: "Find your perfect rental property",
+  },
+  {
+    title: "About",
+    href: "/About",
+    description: "Explore properties for sale",
+  },
+  {
+    title: "Contact",
+    href: "/contact",
+    description: "List your property for sale",
+  },
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    description: "List your property for sale",
+  },
+];
+
+const dashboardItems = [
+  {
+    title: "My Properties",
+    href: "/dashboard/properties",
+    description: "Manage your listed properties",
+  },
+  {
+    title: "Favorites",
+    href: "/dashboard/favorites",
+    description: "View your saved properties",
+  },
+  {
+    title: "Messages",
+    href: "/dashboard/messages",
+    description: "Check your messages",
+  },
+];
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [activeItem, setActiveItem] = useState("")
-
-  const handleItemClick = (item) => {
-    setActiveItem(item === activeItem ? "" : item)
-    setIsMenuOpen(false)
-    if (item === "seller" || item === "buyer") {
-      alert("Please sign up to access this feature")
-    }
-  }
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-[#f5f4ff] shadow-sm transition-shadow hover:shadow-md">
-      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
+    <header className="sticky px-6 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="group flex items-center gap-2 transition-transform duration-300 hover:scale-105">
-          <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[#7065f0] text-white transition-all duration-300 group-hover:bg-[#5a4fd1] group-hover:shadow-lg">
-            <Home className="h-5 w-5 transition-transform duration-300 group-hover:scale-110" />
-          </div>
-          <span className="text-lg md:text-xl lg:text-2xl font-bold text-[#1e293b] transition-colors duration-300 group-hover:text-[#7065f0]">
-            Tenord
-          </span>
+        <Link href="/" className="flex items-center space-x-2">
+          <Building2 className="h-6 w-6 text-primary" />
+          <span className=" font-bold sm:inline-block">Tenord</span>
         </Link>
 
-        {/* Desktop / Tablet Nav (lg and up) */}
-        <div className="hidden lg:flex flex-wrap items-center gap-8">
-          {["rent", "buy"].map((item) => (
-            <Link
-              key={item}
-              href={`/${item}`}
-              className={cn(
-                "relative px-2 py-1 text-[#1e293b] transition-colors duration-300 hover:text-[#7065f0] text-sm md:text-base lg:text-lg",
-                activeItem === item && "text-[#7065f0]"
-              )}
-              onClick={() => handleItemClick(item)}
-            >
-              {item.charAt(0).toUpperCase() + item.slice(1)}
-              <span
-                className={cn(
-                  "absolute bottom-0 left-0 h-0.5 w-0 bg-[#7065f0] transition-all duration-300",
-                  activeItem === item ? "w-full" : "hover:w-full"
-                )}
-              />
-            </Link>
-          ))}
-
-          {["seller", "buyer"].map((item) => (
-            <button
-              key={item}
-              className={cn(
-                "relative px-2 py-1 text-[#1e293b] transition-colors duration-300 hover:text-[#7065f0] text-sm md:text-base lg:text-lg",
-                activeItem === item && "text-[#7065f0]"
-              )}
-              onClick={() => handleItemClick(item)}
-            >
-              {item.charAt(0).toUpperCase() + item.slice(1)} Dashboard
-              <span
-                className={cn(
-                  "absolute bottom-0 left-0 h-0.5 w-0 bg-[#7065f0] transition-all duration-300",
-                  activeItem === item ? "w-full" : "hover:w-full"
-                )}
-              />
-            </button>
-          ))}
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex">
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Browse Properties</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
+                    <li className="row-span-3">
+                      <NavigationMenuLink asChild>
+                        <Link
+                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                          href="/"
+                        >
+                          <Building2 className="h-6 w-6" />
+                          <div className="mb-2 mt-4 text-lg font-medium">
+                            Find Your Dream Home
+                          </div>
+                          <p className="text-sm leading-tight text-muted-foreground">
+                            Browse through thousands of rental properties
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <Link
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          href="/"
+                        >
+                          <div className="text-sm font-medium leading-none">
+                            Apartments
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Modern apartments in prime locations
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                    <li>
+                      <NavigationMenuLink asChild>
+                        <Link
+                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          href=""
+                        >
+                          <div className="text-sm font-medium leading-none">
+                            Houses
+                          </div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Spacious houses for families
+                          </p>
+                        </Link>
+                      </NavigationMenuLink>
+                    </li>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/about" className={navigationMenuTriggerStyle()}>
+                  About
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link href="/contact" className={navigationMenuTriggerStyle()}>
+                  Contact
+                </Link>
+              </NavigationMenuItem>{" "}
+              <NavigationMenuItem>
+                <Link
+                  href="/dashboard"
+                  className={navigationMenuTriggerStyle()}
+                >
+                  Dashboard
+                </Link>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
         </div>
 
-        {/* Auth Buttons + Hamburger */}
-        <div className="flex items-center gap-2 sm:gap-4">
-          <Button
-            variant="outline"
-            className="border-[#7065f0] text-[#1e293b] text-sm md:text-base transition-all duration-300 hover:bg-[#2dd4bf] hover:border-[#2dd4bf] hover:text-white active:scale-95"
-          >
-            Login
-          </Button>
-          <Button className="bg-[#7065f0] text-white text-sm md:text-base transition-all duration-300 hover:bg-[#5a4fd1] active:scale-95">
-            Sign up
+        {/* Right Side Actions */}
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="hidden md:flex">
+            <Search className="h-5 w-5" />
           </Button>
 
-          {/* Hamburger on lg-down */}
-          <button
-            className="ml-1 flex h-10 w-10 items-center justify-center rounded-md text-[#1e293b] transition-colors duration-300 hover:bg-[#7065f0] hover:text-white lg:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          <div className="hidden md:flex md:gap-2">
+            <Link href="/login">
+              <Button variant="outline" className="cursor-pointer" size="lg">
+                Sign In
+              </Button>
+            </Link>
+
+            <Link href="/signup" >
+              <Button size="lg"  > Sign Up </Button>
+            </Link>
+          </div>
+
+          {/* Mobile Menu */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <SheetHeader>
+                <SheetTitle>Tenord</SheetTitle>
+                <SheetDescription>
+                  Rent Homes, Apartments, and more
+                </SheetDescription>
+              </SheetHeader>
+              <div className="flex flex-col gap-4 py-4">
+                {mainNavItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                      pathname === item.href &&
+                        "bg-accent text-accent-foreground"
+                    )}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Home className="h-4 w-4" />
+                    {item.title}
+                  </Link>
+                ))}
+                <div className="my-2 h-px bg-border" />
+                <div className="flex flex-col gap-2">
+                  <Button variant="outline" className="w-full justify-start">
+                    <User className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Button>
+                  <Button className="w-full justify-start">
+                    <User className="mr-2 h-4 w-4" />
+                    Sign Up
+                  </Button>
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
-
-      {/* Mobile Drawer (below lg) */}
-      <div
-        className={cn(
-          "fixed inset-y-0 right-0 z-50 w-64 bg-white p-6 shadow-xl transform transition-transform duration-300 lg:hidden",
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
-        )}
-        aria-hidden={!isMenuOpen}
-      >
-        <button
-          className="absolute right-4 top-4 text-gray-500 hover:text-gray-900"
-          onClick={() => setIsMenuOpen(false)}
-        >
-          <X className="h-6 w-6" />
-        </button>
-        <div className="flex flex-col space-y-6 pt-16">
-          {["rent", "buy"].map((item) => (
-            <Link
-              key={item}
-              href={`/${item}`}
-              className={cn(
-                "text-lg font-medium text-[#1e293b] transition-colors duration-300 hover:text-[#7065f0] md:text-xl",
-                activeItem === item && "text-[#7065f0]"
-              )}
-              onClick={() => handleItemClick(item)}
-            >
-              {item.charAt(0).toUpperCase() + item.slice(1)}
-            </Link>
-          ))}
-
-          {["seller", "buyer"].map((item) => (
-            <button
-              key={item}
-              className={cn(
-                "text-left text-lg font-medium text-[#1e293b] transition-colors duration-300 hover:text-[#7065f0] md:text-xl",
-                activeItem === item && "text-[#7065f0]"
-              )}
-              onClick={() => handleItemClick(item)}
-            >
-              {item.charAt(0).toUpperCase() + item.slice(1)} Dashboard
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Overlay */}
-      <div
-        className={cn(
-          "fixed inset-0 z-40 bg-black/20 backdrop-blur-sm transition-opacity duration-300 lg:hidden",
-          isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}
-        onClick={() => setIsMenuOpen(false)}
-        aria-hidden={!isMenuOpen}
-      />
-    </nav>
-)
+    </header>
+  );
 }
