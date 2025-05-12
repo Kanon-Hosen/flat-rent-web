@@ -172,8 +172,11 @@ export default function Navbar() {
               </Button>
             </Link>
 
-            <Link href="/signup" >
-              <Button size="lg"  > Sign Up </Button>
+            <Link href="/signup">
+              <Button size="lg" className="cursor-pointer">
+                {" "}
+                Sign Up{" "}
+              </Button>
             </Link>
           </div>
 
