@@ -1,5 +1,6 @@
 import React from "react";
+import Hero from "@/components/Hero";
 
 export default async function Home() {
-  return <div>Home</div>;
+  return <div><Hero/></div>;
 }
