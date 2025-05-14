@@ -2,9 +2,8 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useState } from "react";
-
-import { usePathname } from "next/navigation";
+import { useState, useCallback } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
@@ -25,6 +24,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import useAuth from "@/lib/hooks/UserAuth";
 
 const mainNavItems = [
   {
@@ -34,18 +34,13 @@ const mainNavItems = [
   },
   {
     title: "About",
-    href: "/About",
-    description: "Explore properties for sale",
+    href: "/about",
+    description: "Learn more about us",
   },
   {
     title: "Contact",
     href: "/contact",
-    description: "List your property for sale",
-  },
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    description: "List your property for sale",
+    description: "Get in touch with us",
   },
 ];
 
@@ -69,7 +64,75 @@ const dashboardItems = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, isLoading, refetch } = useAuth();
+
+  const handleLogout = useCallback(async () => {
+    try {
+      setIsLoggingOut(true);
+      const response = await fetch("/api/v1/auth/logout", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        await refetch();
+        window.location.href = "/";
+      } else {
+        console.error("Logout failed");
+        setIsLoggingOut(false);
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      setIsLoggingOut(false);
+    }
+  }, [refetch]);
+
+  const renderAuthButtons = () => {
+    if (isLoading) {
+      return <div className="h-10 w-20 animate-pulse bg-primary rounded-md" />;
+    }
+
+    if (user) {
+      return (
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard">
+            <Button variant="ghost" className="hidden md:flex cursor-pointer">
+              Dashboard
+            </Button>
+          </Link>
+          <Button
+            variant="outline"
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="cursor-pointer"
+          >
+            {isLoggingOut ? "Signing Out..." : "Sign Out"}
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="hidden md:flex md:gap-2">
+        <Link href="/login">
+          <Button variant="outline" className="cursor-pointer" size="lg">
+            Sign In
+          </Button>
+        </Link>
+        <Link href="/signup">
+          <Button size="lg" className="cursor-pointer">
+            Sign Up
+          </Button>
+        </Link>
+      </div>
+    );
+  };
 
   return (
     <header className="sticky px-6 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -77,14 +140,14 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <Building2 className="h-6 w-6 text-primary" />
-          <span className=" font-bold sm:inline-block">Tenord</span>
+          <span className="font-bold sm:inline-block">Tenord</span>
         </Link>
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex">
           <NavigationMenu>
             <NavigationMenuList>
-              <NavigationMenuItem>
+              {/* <NavigationMenuItem>
                 <NavigationMenuTrigger>Browse Properties</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
@@ -92,7 +155,7 @@ export default function Navbar() {
                       <NavigationMenuLink asChild>
                         <Link
                           className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                          href="/"
+                          href="/rent"
                         >
                           <Building2 className="h-6 w-6" />
                           <div className="mb-2 mt-4 text-lg font-medium">
@@ -108,7 +171,7 @@ export default function Navbar() {
                       <NavigationMenuLink asChild>
                         <Link
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          href="/"
+                          href="/rent?type=apartment"
                         >
                           <div className="text-sm font-medium leading-none">
                             Apartments
@@ -123,7 +186,7 @@ export default function Navbar() {
                       <NavigationMenuLink asChild>
                         <Link
                           className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          href=""
+                          href="/rent?type=house"
                         >
                           <div className="text-sm font-medium leading-none">
                             Houses
@@ -136,25 +199,17 @@ export default function Navbar() {
                     </li>
                   </ul>
                 </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/about" className={navigationMenuTriggerStyle()}>
-                  About
-                </Link>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <Link href="/contact" className={navigationMenuTriggerStyle()}>
-                  Contact
-                </Link>
-              </NavigationMenuItem>{" "}
-              <NavigationMenuItem>
-                <Link
-                  href="/dashboard"
-                  className={navigationMenuTriggerStyle()}
-                >
-                  Dashboard
-                </Link>
-              </NavigationMenuItem>
+              </NavigationMenuItem> */}
+              {mainNavItems.map((item) => (
+                <NavigationMenuItem key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={navigationMenuTriggerStyle()}
+                  >
+                    {item.title}
+                  </Link>
+                </NavigationMenuItem>
+              ))}
             </NavigationMenuList>
           </NavigationMenu>
         </div>
@@ -164,21 +219,7 @@ export default function Navbar() {
           <Button variant="ghost" size="icon" className="hidden md:flex">
             <Search className="h-5 w-5" />
           </Button>
-
-          <div className="hidden md:flex md:gap-2">
-            <Link href="/login">
-              <Button variant="outline" className="cursor-pointer" size="lg">
-                Sign In
-              </Button>
-            </Link>
-
-            <Link href="/signup">
-              <Button size="lg" className="cursor-pointer">
-                {" "}
-                Sign Up{" "}
-              </Button>
-            </Link>
-          </div>
+          {renderAuthButtons()}
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -210,17 +251,46 @@ export default function Navbar() {
                     {item.title}
                   </Link>
                 ))}
+                {user && (
+                  <>
+                    <div className="my-2 h-px bg-border" />
+                    {dashboardItems.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={cn(
+                          "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                          pathname === item.href &&
+                            "bg-accent text-accent-foreground"
+                        )}
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Home className="h-4 w-4" />
+                        {item.title}
+                      </Link>
+                    ))}
+                  </>
+                )}
                 <div className="my-2 h-px bg-border" />
-                <div className="flex flex-col gap-2">
-                  <Button variant="outline" className="w-full justify-start">
-                    <User className="mr-2 h-4 w-4" />
-                    Sign In
-                  </Button>
-                  <Button className="w-full justify-start">
-                    <User className="mr-2 h-4 w-4" />
-                    Sign Up
-                  </Button>
-                </div>
+                {!user && (
+                  <div className="flex flex-col gap-2">
+                    <Link href="/login">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
+                        <User className="mr-2 h-4 w-4" />
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link href="/signup">
+                      <Button className="w-full justify-start">
+                        <User className="mr-2 h-4 w-4" />
+                        Sign Up
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </div>
             </SheetContent>
           </Sheet>

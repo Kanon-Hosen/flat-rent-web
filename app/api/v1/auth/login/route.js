@@ -33,8 +33,9 @@ export async function POST(req) {
     }
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "30d", // 30 days
     });
+    // const token = await generateToken(user.id);
 
     const response = NextResponse.json({ token }, { status: 200 });
 
@@ -42,8 +43,10 @@ export async function POST(req) {
       httpOnly: true,
       // secure: process.env.NODE_ENV !== "development",
       sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
     });
     return response;
+    // return NextResponse.json({ token, user }, { status: 200 });
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(
