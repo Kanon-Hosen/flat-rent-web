@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import useAuth from "@/lib/hooks/UserAuth";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -54,9 +55,9 @@ const formSchema = z.object({
       message: "Password must contain at least one lowercase letter",
     })
     .regex(/[0-9]/, { message: "Password must contain at least one number" }),
-    // .regex(/[^A-Za-z0-9]/, {
-    //   message: "Password must contain at least one special character",
-    // }),
+  // .regex(/[^A-Za-z0-9]/, {
+  //   message: "Password must contain at least one special character",
+  // }),
   role: z.enum(["renter", "owner"], {
     required_error: "Please select a role",
   }),
@@ -65,6 +66,7 @@ const formSchema = z.object({
 export default function SignUp() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { user, isLoading , isAuthenticated} = useAuth();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -76,6 +78,39 @@ export default function SignUp() {
     },
   });
 
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, router]);
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              <div className="space-y-3">
+                <div className="h-10 bg-gray-200 rounded"></div>
+                <div className="h-10 bg-gray-200 rounded"></div>
+                <div className="h-10 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Don't render the form if user is logged in
+  if (user) {
+    return null;
+  }
+
   const onSubmit = async (values) => {
     setLoading(true);
     try {
@@ -85,16 +120,17 @@ export default function SignUp() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
+        credentials: "include",
       });
 
       const data = await res.json();
-      console.log(data)
+      console.log(data);
 
       if (!res.ok) {
         throw new Error(data.error || "Something went wrong");
       }
 
-      router.push("/login");
+      router.push("/dashboard");
     } catch (error) {
       form.setError("root", {
         message: error.message,

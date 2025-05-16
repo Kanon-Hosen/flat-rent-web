@@ -5,7 +5,7 @@ import HeroSection2 from "@/components/Hero2";
 
 
 export default async function Home() {
-  return <div>
+  return <div className="overflow-hidden">
     <Hero/>
     <HeroSection2/>
     </div>;
