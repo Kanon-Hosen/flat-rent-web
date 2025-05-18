@@ -88,7 +88,6 @@ export default function CardsLayout() {
     alert(`Showing more details about property ${id}!`)
   }
 
-  // Container animation
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
