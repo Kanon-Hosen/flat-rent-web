@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,7 +37,13 @@ const formSchema = z.object({
 export default function Login() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const { refetch } = useAuth();
+  const { user, isLoading, refetch } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router]);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -66,10 +72,9 @@ export default function Login() {
       }
 
       // Refresh auth state
-      await refetch();
 
-      // Force a hard refresh to ensure all components are updated
-      window.location.href = "/";
+      await refetch();
+      router.push("/");
     } catch (error) {
       form.setError("root", {
         message: error.message,
@@ -79,13 +84,33 @@ export default function Login() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
+          <CardContent className="p-6">
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              <div className="space-y-3">
+                <div className="h-10 bg-gray-200 rounded"></div>
+                <div className="h-10 bg-gray-200 rounded"></div>
+                <div className="h-10 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
           <CardDescription className="text-center">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/signup" className="text-primary hover:underline">
               Sign up
             </Link>

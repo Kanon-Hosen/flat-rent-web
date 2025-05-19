@@ -7,7 +7,7 @@ import CardsLayout from "@/components/cards-layout";
 
 
 export default async function Home() {
-  return <div>
+  return <div className="overflow-hidden">
     <Hero/>
     <HeroSection2/>
 

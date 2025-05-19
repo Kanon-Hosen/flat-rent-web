@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
@@ -15,7 +15,20 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home, Building2, Search, User } from "lucide-react";
+import {
+  Menu,
+  Building2,
+  Search,
+  User,
+  LogOut,
+  Home,
+  Info,
+  MessageSquare,
+  Heart,
+  KeyRound,
+  Phone,
+  X,
+} from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -24,7 +37,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import useAuth from "@/lib/hooks/UserAuth";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const mainNavItems = [
   {
@@ -65,9 +86,15 @@ const dashboardItems = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const router = useRouter();
   const { user, isLoading, refetch } = useAuth();
+
+  useEffect(() => {
+    refetch();
+  }, [pathname, refetch]);
 
   const handleLogout = useCallback(async () => {
     try {
@@ -82,27 +109,45 @@ export default function Navbar() {
 
       if (response.ok) {
         await refetch();
-        window.location.href = "/";
+        router.push("/");
       } else {
         console.error("Logout failed");
-        setIsLoggingOut(false);
       }
     } catch (error) {
       console.error("Logout error:", error);
+    } finally {
       setIsLoggingOut(false);
     }
-  }, [refetch]);
+  }, [refetch, router]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/rent?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
 
   const renderAuthButtons = () => {
     if (isLoading) {
-      return <div className="h-10 w-20 animate-pulse bg-primary rounded-md" />;
+      return (
+        <div className="flex items-center gap-4">
+          <div className="h-10 w-20 animate-pulse bg-gray-200 rounded-md" />
+          <div className="h-10 w-24 animate-pulse bg-gray-200 rounded-md" />
+        </div>
+      );
     }
 
     if (user) {
       return (
         <div className="flex items-center gap-4">
           <Link href="/dashboard">
-            <Button variant="ghost" className="hidden md:flex cursor-pointer">
+            <Button
+              variant="ghost"
+              className="hidden md:flex cursor-pointer hover:bg-primary/10"
+            >
+              <User className="mr-2 h-4 w-4" />
               Dashboard
             </Button>
           </Link>
@@ -110,188 +155,222 @@ export default function Navbar() {
             variant="outline"
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="cursor-pointer"
+            className="cursor-pointer hover:bg-destructive/10 hover:text-destructive hover:border-destructive"
           >
+            <LogOut className="mr-2 h-4 w-4" />
             {isLoggingOut ? "Signing Out..." : "Sign Out"}
           </Button>
         </div>
       );
     }
 
-    return (
-      <div className="hidden md:flex md:gap-2">
-        <Link href="/login">
-          <Button variant="outline" className="cursor-pointer" size="lg">
-            Sign In
-          </Button>
-        </Link>
-        <Link href="/signup">
-          <Button size="lg" className="cursor-pointer">
-            Sign Up
-          </Button>
-        </Link>
-      </div>
-    );
+    if (!user) {
+      return (
+        <div className="hidden md:flex md:gap-3">
+          <Link href="/login">
+            <Button
+              variant="outline"
+              className="cursor-pointer hover:bg-primary/10 hover:text-primary hover:border-primary"
+              size="lg"
+            >
+              Sign In
+            </Button>
+          </Link>
+          <Link href="/signup">
+            <Button
+              size="lg"
+              className="cursor-pointer bg-primary hover:bg-primary/90"
+            >
+              Sign Up
+            </Button>
+          </Link>
+        </div>
+      );
+    }
+
+    return null;
+  };
+
+  const getIconForItem = (title) => {
+    switch (title) {
+      case "Browse Properties":
+        return <KeyRound className="h-5 w-5 shrink-0" />;
+      case "About":
+        return <Info className="h-5 w-5 shrink-0" />;
+      case "Contact":
+        return <Phone className="h-5 w-5 shrink-0" />;
+      case "My Properties":
+        return <Building2 className="h-5 w-5 shrink-0" />;
+      case "Favorites":
+        return <Heart className="h-5 w-5 shrink-0" />;
+      case "Messages":
+        return <MessageSquare className="h-5 w-5 shrink-0" />;
+      default:
+        return <Home className="h-5 w-5 shrink-0" />;
+    }
   };
 
   return (
-    <header className="sticky px-6 top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center space-x-2">
-          <Building2 className="h-6 w-6 text-primary" />
-          <span className="font-bold sm:inline-block">Tenord</span>
-        </Link>
+    <header className="sticky  flex justify-center top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between px-4 md:px-8">
+        {/* Logo and Navigation */}
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center space-x-2">
+            <Building2 className="h-6 w-6 text-primary" />
+            <span className="font-bold text-lg sm:inline-block">Tenord</span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex">
-          <NavigationMenu>
-            <NavigationMenuList>
-              {/* <NavigationMenuItem>
-                <NavigationMenuTrigger>Browse Properties</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-2">
-                    <li className="row-span-3">
-                      <NavigationMenuLink asChild>
-                        <Link
-                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                          href="/rent"
-                        >
-                          <Building2 className="h-6 w-6" />
-                          <div className="mb-2 mt-4 text-lg font-medium">
-                            Find Your Dream Home
-                          </div>
-                          <p className="text-sm leading-tight text-muted-foreground">
-                            Browse through thousands of rental properties
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          href="/rent?type=apartment"
-                        >
-                          <div className="text-sm font-medium leading-none">
-                            Apartments
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Modern apartments in prime locations
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                    <li>
-                      <NavigationMenuLink asChild>
-                        <Link
-                          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                          href="/rent?type=house"
-                        >
-                          <div className="text-sm font-medium leading-none">
-                            Houses
-                          </div>
-                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Spacious houses for families
-                          </p>
-                        </Link>
-                      </NavigationMenuLink>
-                    </li>
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem> */}
-              {mainNavItems.map((item) => (
-                <NavigationMenuItem key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={navigationMenuTriggerStyle()}
-                  >
-                    {item.title}
-                  </Link>
-                </NavigationMenuItem>
-              ))}
-            </NavigationMenuList>
-          </NavigationMenu>
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex">
+            <NavigationMenu>
+              <NavigationMenuList>
+                {mainNavItems.map((item) => (
+                  <NavigationMenuItem key={item.title}>
+                    <Link
+                      href={item.href}
+                      className={cn(
+                        navigationMenuTriggerStyle(),
+                        "bg-transparent hover:bg-primary/10 hover:text-primary"
+                      )}
+                    >
+                      {item.title}
+                    </Link>
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
         </div>
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="hidden md:flex">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden md:flex hover:bg-primary/10 hover:text-primary"
+            onClick={() => setIsSearchOpen(true)}
+          >
             <Search className="h-5 w-5" />
           </Button>
           {renderAuthButtons()}
 
+          {/* Search Dialog */}
+          <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Search Properties</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSearch} className="space-y-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by location, property type..."
+                    className="pl-9"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsSearchOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit">Search</Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden hover:bg-primary/10 hover:text-primary"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-              <SheetHeader>
-                <SheetTitle>Tenord</SheetTitle>
-                <SheetDescription>
-                  Rent Homes, Apartments, and more
+              <SheetHeader className="space-y-2">
+                <SheetTitle className="text-2xl">Tenord</SheetTitle>
+                <SheetDescription className="text-base">
+                  Find Your Perfect Home
                 </SheetDescription>
               </SheetHeader>
-              <div className="flex flex-col gap-4 py-4">
-                {mainNavItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                      pathname === item.href &&
-                        "bg-accent text-accent-foreground"
-                    )}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <Home className="h-4 w-4" />
-                    {item.title}
-                  </Link>
-                ))}
-                {user && (
-                  <>
-                    <div className="my-2 h-px bg-border" />
-                    {dashboardItems.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={cn(
-                          "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
-                          pathname === item.href &&
-                            "bg-accent text-accent-foreground"
-                        )}
-                        onClick={() => setIsOpen(false)}
-                      >
-                        <Home className="h-4 w-4" />
-                        {item.title}
-                      </Link>
-                    ))}
-                  </>
-                )}
-                <div className="my-2 h-px bg-border" />
-                {!user && (
-                  <div className="flex flex-col gap-2">
-                    <Link href="/login">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start"
-                      >
-                        <User className="mr-2 h-4 w-4" />
-                        Sign In
-                      </Button>
-                    </Link>
-                    <Link href="/signup">
-                      <Button className="w-full justify-start">
-                        <User className="mr-2 h-4 w-4" />
-                        Sign Up
-                      </Button>
-                    </Link>
-                  </div>
-                )}
+              <div className="py-4">
+                <form onSubmit={handleSearch} className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Search properties..."
+                    className="pl-9"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </form>
               </div>
+              <ScrollArea className="h-[calc(100vh-12rem)] pb-10">
+                <div className="flex flex-col gap-4">
+                  {mainNavItems.map((item) => (
+                    <Link
+                      key={item.title}
+                      href={item.href}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors hover:bg-primary/10 hover:text-primary text-left",
+                        pathname === item.href && "bg-primary/10 text-primary"
+                      )}
+                      onClick={() => setIsOpen(false)}
+                    >
+                      {getIconForItem(item.title)}
+                      <span className="flex-1">{item.title}</span>
+                    </Link>
+                  ))}
+                  {user && (
+                    <>
+                      <div className="my-2 h-px bg-border" />
+                      {dashboardItems.map((item) => (
+                        <Link
+                          key={item.title}
+                          href={item.href}
+                          className={cn(
+                            "flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors hover:bg-primary/10 hover:text-primary text-left",
+                            pathname === item.href &&
+                              "bg-primary/10 text-primary"
+                          )}
+                          onClick={() => setIsOpen(false)}
+                        >
+                          {getIconForItem(item.title)}
+                          <span className="flex-1">{item.title}</span>
+                        </Link>
+                      ))}
+                    </>
+                  )}
+                  <div className="my-2 h-px bg-border" />
+                  {!user && (
+                    <div className="flex flex-col gap-3 px-4">
+                      <Link href="/login" className="w-full">
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start gap-3 px-4 py-3 text-base hover:bg-primary/10 hover:text-primary hover:border-primary"
+                        >
+                          <User className="h-5 w-5 shrink-0" />
+                          <span className="flex-1 text-left">Sign In</span>
+                        </Button>
+                      </Link>
+                      <Link href="/signup" className="w-full">
+                        <Button className="w-full justify-start gap-3 px-4 py-3 text-base bg-primary hover:bg-primary/90">
+                          <User className="h-5 w-5 shrink-0" />
+                          <span className="flex-1 text-left">Sign Up</span>
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
             </SheetContent>
           </Sheet>
         </div>
