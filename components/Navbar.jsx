@@ -50,7 +50,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 const mainNavItems = [
   {
     title: "Browse Properties",
-    href: "/rent",
+    href: "/browse-properties",
     description: "Find your perfect rental property",
   },
   {
