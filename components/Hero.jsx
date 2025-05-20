@@ -120,7 +120,7 @@ export default function Hero() {
 
         {/* Image Carousel */}
         <div className="flex-1 w-full max-w-lg">
-          <Card className="shadow-2xl rounded-2xl overflow-hidden border-2 border-white/20 bg-white/90 backdrop-blur-sm group">
+          <Card className="shadow-2xl rounded-2xl overflow-hidden border-2 w-full h-full border-white/20 bg-white/90 backdrop-blur-sm group">
             <CardContent className="p-0 relative">
               <div className="relative h-72 md:h-96 overflow-hidden">
                 {/* Carousel Images */}
@@ -140,7 +140,7 @@ export default function Hero() {
                     <img
                       src={image.src}
                       alt={image.alt}
-                      className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full object-fit object-center transition-transform duration-700 group-hover:scale-105"
                       style={{
                         clipPath:
                           "polygon(0 0, 100% 0, 100% 85%, 75% 95%, 50% 100%, 25% 95%, 0 85%)",
