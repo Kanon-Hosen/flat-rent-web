@@ -5,11 +5,11 @@ import PropertyCardV2 from "@/components/PropertyCard";
 import CardsLayout from "@/components/cards-layout";
 import TestimonialsSection from "@/components/Testimonials";
 import LandlordCTA from "@/components/LandlordCTA";
-import Footer from "@/components/Footer";
+// import Footer from "@/components/Footer";
 
 
 export default async function Home() {
-  return <div>
+  return <div className="overflow-hidden">
     <Hero/>
     <HeroSection2/>
 
@@ -67,7 +67,7 @@ export default async function Home() {
 
 
 
-    <Footer/>
+    {/* <Footer/> */}
 
 
 

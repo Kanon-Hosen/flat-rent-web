@@ -197,7 +197,7 @@
 
 
 /* Hero Section Styles */
-.hero-section {
+/* .hero-section {
   width: 100%;
   background-color: #f5f5ff;
   padding: 2rem 1rem;
@@ -236,7 +236,7 @@
   max-width: 500px;
 }
 /* Tabs */
-.tab-container {
+/* .tab-container {
   background-color: white;
   border-radius: 0.75rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -288,7 +288,7 @@
   }
 }
 /* Search Form */
-.search-form {
+/* .search-form {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
@@ -343,9 +343,9 @@
 }
 .browse-button:active {
   transform: translateY(0);
-}
+} */
 /* Stats */
-.stats-container {
+/* .stats-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -388,9 +388,9 @@
   font-size: 0.875rem;
   color: #64748b;
   margin: 0;
-}
+} */
 /* Carousel */
-.carousel-container {
+/* .carousel-container {
   position: relative;
   width: 100%;
   height: 300px;
@@ -471,9 +471,9 @@
 }
 .carousel-indicator:hover {
   background-color: rgba(255, 255, 255, 0.8);
-}
+} */
 /* Responsive Styles */
-@media (min-width: 768px) {
+/* @media (min-width: 768px) {
   .hero-section {
     padding: 3rem 2rem;
   }
@@ -519,9 +519,9 @@
     flex: 1;
     height: 450px;
   }
-}
+} */
 /* Animations */
-@keyframes fadeIn {
+/* @keyframes fadeIn {
   from {
     opacity: 0;
   }
@@ -565,4 +565,4 @@
 
     clip-path: polygon(25% 0%, 100% 1%, 100% 100%, 25% 100%, 0% 50%);
 
-}
+}  */
