@@ -3,6 +3,8 @@ import Hero from "@/components/Hero";
 import HeroSection2 from "@/components/Hero2";
 import PropertyCardV2 from "@/components/PropertyCard";
 import CardsLayout from "@/components/cards-layout";
+import TestimonialsSection from "@/components/Testimonials";
+import LandlordCTA from "@/components/LandlordCTA";
 
 
 
@@ -15,6 +17,9 @@ export default async function Home() {
 
 
     <CardsLayout/>
+    <TestimonialsSection/>
+
+    <LandlordCTA/>
 
 
 
