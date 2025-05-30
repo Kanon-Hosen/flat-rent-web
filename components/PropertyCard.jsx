@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -22,7 +21,6 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
-
 export default function PropertyCardV2({
   id,
   imageUrl,
@@ -40,7 +38,6 @@ export default function PropertyCardV2({
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
-
   // Category configuration
   const categoryConfig = {
     apartment: {
@@ -59,14 +56,11 @@ export default function PropertyCardV2({
       color: "bg-purple-100 text-purple-700",
     },
   };
-
   const currentCategory = categoryConfig[category] || categoryConfig.apartment;
-
   const handleExploreClick = (e) => {
     e.preventDefault();
     router.push(`/explore/${id}`);
   };
-
   // Loading skeleton state
   if (isLoading) {
     return (
@@ -87,7 +81,6 @@ export default function PropertyCardV2({
       </Card>
     );
   }
-
   return (
     <Card
       className={cn(
@@ -115,7 +108,6 @@ export default function PropertyCardV2({
               isHovered && "filter brightness-[0.95]"
             )}
           />
-
           {/* Category Badge */}
           <div className="absolute top-3 left-3 z-10">
             <Badge
@@ -128,7 +120,6 @@ export default function PropertyCardV2({
               {currentCategory.label}
             </Badge>
           </div>
-
           {/* Price Tag */}
           <div className="absolute top-3 right-3 z-10">
             <Badge className="bg-black/80 text-white px-2 py-1 text-base font-semibold">
@@ -136,7 +127,6 @@ export default function PropertyCardV2({
               <span className="text-xs font-normal ml-0.5">{priceUnit}</span>
             </Badge>
           </div>
-
           {/* Show More Button */}
           <motion.div
             className="absolute bottom-3 left-1/2 transform -translate-x-1/2 z-10"
@@ -156,7 +146,6 @@ export default function PropertyCardV2({
               <ExternalLink className="h-3.5 w-3.5" />
             </Button>
           </motion.div>
-
           {/* Dark overlay on hover */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
@@ -166,7 +155,6 @@ export default function PropertyCardV2({
           />
         </motion.div>
       </div>
-
       <CardContent className="p-4 space-y-3">
         {/* Property Name and Rating */}
         <div className="flex items-center justify-between">
@@ -178,7 +166,6 @@ export default function PropertyCardV2({
             <span className="text-sm font-semibold text-yellow-700">4.9</span>
           </div>
         </div>
-
         {/* Location */}
         <div className="flex items-center justify-between text-gray-600">
           <div className="flex items-center gap-1.5 min-w-0">
@@ -190,7 +177,6 @@ export default function PropertyCardV2({
             <span>Available Now</span>
           </div>
         </div>
-
         {/* Property Details */}
         <div className="grid grid-cols-3 gap-2 pt-1">
           <div className="flex flex-col items-center justify-center gap-0.5 p-2 rounded-lg bg-gray-50">
@@ -202,7 +188,6 @@ export default function PropertyCardV2({
               Spacious Rooms
             </span>
           </div>
-
           <div className="flex flex-col items-center justify-center gap-0.5 p-2 rounded-lg bg-gray-50">
             <div className="flex items-center justify-center gap-1 text-gray-600">
               <Bath className="h-4 w-4 text-primary shrink-0" />
@@ -212,7 +197,6 @@ export default function PropertyCardV2({
               Modern Bathrooms
             </span>
           </div>
-
           <div className="flex flex-col items-center justify-center gap-0.5 p-2 rounded-lg bg-gray-50">
             <div className="flex items-center justify-center gap-1 text-gray-600">
               <Square className="h-4 w-4 text-primary shrink-0" />
@@ -223,7 +207,6 @@ export default function PropertyCardV2({
             </span>
           </div>
         </div>
-
         {/* Status and Actions */}
         <div className="flex items-center justify-between pt-1">
           <div className="flex items-center gap-1.5 min-w-0">

@@ -6,6 +6,7 @@ import CardsLayout from "@/components/cards-layout";
 import TestimonialsSection from "@/components/Testimonials";
 import LandlordCTA from "@/components/LandlordCTA";
 // import Footer from "@/components/Footer";
+import PropertyDetailsPage from "@/components/PropertyDetailsPage";
 
 
 export default async function Home() {
@@ -13,8 +14,7 @@ export default async function Home() {
     <Hero/>
     <HeroSection2/>
 
-
-
+    <PropertyDetailsPage/>
 
     <CardsLayout/>
     <TestimonialsSection/>
