@@ -59,7 +59,7 @@ export default function PropertyCardV2({
   const currentCategory = categoryConfig[category] || categoryConfig.apartment;
   const handleExploreClick = (e) => {
     e.preventDefault();
-    router.push(`/explore/${id}`);
+    router.push(`/explore/${title}`);
   };
   // Loading skeleton state
   if (isLoading) {
